@@ -1,15 +1,18 @@
 # my-klipper-configs
-klipper config that i currently use
 
-## i have a Sidewinder X1 with the following mods
-- BL Touch by Waggster -> https://www.thingiverse.com/thing:3716043
-- no z axis syn belt (i use Z TILT)
-- filament runout sensor connected to X+
-- magnatic aluminud bed with PEI sheet or FR4 sheet for TPU
+Klipper config files for a Sidewinder X1 running the Waggster BLTouch mod
 
-i use fluidd as a gui
+## Printer Mods / Changes
 
-i use kiauth for software managemet/installation -> https://github.com/th33xitus/KIAUH
+- BLTouch by Waggster -> https://www.thingiverse.com/thing:3716043
+- Removed Z-axis sync belt (Z-TILT is used to keep them synced)
+- Filament runout sensor connected to X+
 
-you will also need a cura plugin called "Mesh Print Size" 
-it will tell klipper how big the base of the print is and probe the bed in that area.
+Fluidd is used for the UI interface
+
+Kiauth is used for software managment/installation -> https://github.com/th33xitus/KIAUH
+
+## Notes
+
+You may need a cura plugin called "Mesh Print Size"
+It is used to tell klipper how big the base of the print is and probe the bed in that area.
