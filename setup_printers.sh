@@ -51,59 +51,24 @@ for printer_folder in "${printer_folders[@]}"; do
   echo ""
   echo "Processing printer folder: $printer_folder"
 
-  # Create gcodes symlink in printer folder
-  ln -sf "$gcodes_path" "$printer_folder"
-
   # Create config folder in printer folder
   config_folder="$printer_folder/config"
   mkdir -p "$config_folder"
 
-  # Remove existing config symlink if it exists
-  if [ -L "$config_folder/config" ]; then
-    rm "$config_folder/config"
-  fi
-
+  # Create gcodes symlink in printer folder
+  ln -sf "$gcodes_path" "$printer_folder"
   # Create config symlink in printer folder
-  ln -s "$main_configs_path/config" "$config_folder/config"
-
-  # Remove existing macros symlink if it exists
-  if [ -L "$config_folder/macros" ]; then
-    rm "$config_folder/macros"
-  fi
-
+  ln -sf "$main_configs_path/config" "$config_folder/config"
   # Create macros symlink in printer folder
-  ln -s "$main_configs_path/macros" "$config_folder/macros"
-  
-  # Copy mainsail.cfg to printer folder
-  cp "$main_configs_path/mainsail.cfg" "$printer_folder/config"
+  ln -sf "$main_configs_path/macros" "$config_folder/macros"
+  # Create defaults symlink in printer folder
+  ln -sf "$main_configs_path/defaults" "$config_folder/defaults"
 
   # Check if printer.cfg already exists
-  if [ -f "$printer_folder/config/printer.cfg" ]; then
-    echo "Preserving existing serial port information in printer.cfg..."
-    # Preserve existing serial port information
-    existing_serial=$(grep -oP '(?<=serial: ).*' "$printer_folder/config/printer.cfg")
-    temp_file=$(mktemp)
-    cp "$main_configs_path/printer.cfg" "$temp_file"
-    sed -i "s|SERIAL_PLACEHOLDER|$existing_serial|" "$temp_file"
-
-    # Get lines from 'SAVE_CONFIG' and below
-    save_config=$(awk '/SAVE_CONFIG/{flag=1;next}flag' "$printer_folder/config/printer.cfg")
-
-    # Delete everything from 'SAVE_CONFIG' to the end of the file in temp_file
-    sed -i '/SAVE_CONFIG/,$d' "$temp_file"
-
-    # Append save_config lines to the temporary file
-    echo "$save_config" >> "$temp_file"
-
-    mv "$temp_file" "$printer_folder/config/printer.cfg"
-  else
+  if ![ -f "$printer_folder/config/printer.cfg" ]; then
     cp "$main_configs_path/printer.cfg" "$printer_folder/config"
     echo "Printer.cfg file copied to printer folder."
   fi
-
-  # Edit moonraker.conf file to replace cors_domains section with *:*
-  moonraker_conf_file="$printer_folder/config/moonraker.conf"
-  sed -i '/cors_domains:/,/^\s*$/{//!d}; /^cors_domains:/a\    *:*' "$moonraker_conf_file"
 
   echo "Processing of printer folder $printer_folder completed."
   echo ""
