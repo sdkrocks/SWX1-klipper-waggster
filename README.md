@@ -6,6 +6,7 @@ This is a setup for multiple printers, where a script sets up each printer's con
 To make it work for 1, there are changes that need to be made. 
 - Set the MCU ID
 - Install KAMP and & follow their guide
+- Change the virtual sd card path in printer.cfg
 
 ## Printer Mods / Changes
 
