@@ -5,29 +5,30 @@ main_configs_path=~/main_configs
 printer_folders_path=~/printer_*
 gcodes_path="/llabs/gcodes"
 
-# Clone the main_configs repository into the home directory
-echo "Cloning main_configs repository..."
-git clone -q "$main_configs_repo" "$main_configs_path" 2>/dev/null
-if [ $? -eq 0 ]; then
-  echo "Cloned main_configs repository successfully."
-else
-  echo "Main_configs repository already exists. Resetting to match the remote repository..."
-  cd "$main_configs_path"
-  
-  # Fetch the latest changes
-  git fetch -q origin
-  
-  # Reset the local copy to match the remote repository
-  git reset --hard origin/main
-  
-  if [ $? -eq 0 ]; then
-    echo "Updated main_configs repository successfully."
-  else
-    echo "Failed to update the main_configs repository. Please update it manually."
-  fi
+kamp_repo="https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging.git"
+kamp_path=~/KAMP
 
-  cd -
+# Clone the main_configs repository into the home directory
+echo "Cloning main_configs repository"
+if [ -d "$main_configs_path" ]; then
+    # Folder exists, remove local changes and pull
+    cd "$main_configs_path" && git fetch --all && git reset --hard origin/main
+else
+    # Folder does not exist, clone the repository
+    git clone "$main_configs_repo" "$main_configs_path"
 fi
+
+# Clone KAMP repository into the home directory
+echo "Cloning main_configs repository"
+if [ -d "$kamp_path" ]; then
+    # Folder exists, remove local changes and pull
+    cd "$kamp_path" && git fetch --all && git reset --hard origin/main
+else
+    # Folder does not exist, clone the repository
+    git clone "$kamp_repo" "$kamp_path"
+fi
+
+cd ~/
 
 sleep 1
 
@@ -55,20 +56,24 @@ for printer_folder in "${printer_folders[@]}"; do
   config_folder="$printer_folder/config"
   mkdir -p "$config_folder"
 
-  # Create gcodes symlink in printer folder
+  # Create necessary symlinks
   ln -sf "$gcodes_path" "$printer_folder"
-  # Create config symlink in printer folder
   ln -sf "$main_configs_path/config" "$config_folder/config"
-  # Create macros symlink in printer folder
   ln -sf "$main_configs_path/macros" "$config_folder/macros"
-  # Create defaults symlink in printer folder
   ln -sf "$main_configs_path/defaults" "$config_folder/defaults"
+  # Setup KAMP
+  ln -sf ~/KAMP/Configuration "$config_folder/KAMP"
+  cp "$main_configs_path/KAMP_Config.cfg" "$config_folder"
 
   # Check if printer.cfg already exists
-  if ![ -f "$printer_folder/config/printer.cfg" ]; then
-    cp "$main_configs_path/printer.cfg" "$printer_folder/config"
-    echo "Printer.cfg file copied to printer folder."
+  if ![ -f "$config_folder/printer.cfg" ]; then
+    cp "$main_configs_path/printer.cfg" "$config_folder"
+    echo "printer.cfg file copied to printer folder."
   fi
+
+  # Edit moonraker.conf file to replace cors_domains section with *:*
+  moonraker_conf_file="$config_folder/moonraker.conf"
+  sed -i '/cors_domains:/,/^\s*$/{//!d}; /^cors_domains:/a\    *:*' "$moonraker_conf_file"
 
   echo "Processing of printer folder $printer_folder completed."
   echo ""
