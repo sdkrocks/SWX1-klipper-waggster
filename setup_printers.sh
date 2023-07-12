@@ -60,6 +60,7 @@ for printer_folder in "${printer_folders[@]}"; do
   mkdir -p "$config_folder"
 
   # Create necessary symlinks
+  rmdir "$printer_folder/gcodes"
   ln -sf "$gcodes_path" "$printer_folder"
   ln -sf "$main_configs_path/config" "$config_folder/config"
   ln -sf "$main_configs_path/macros" "$config_folder/macros"
