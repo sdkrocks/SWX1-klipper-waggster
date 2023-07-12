@@ -66,7 +66,7 @@ for printer_folder in "${printer_folders[@]}"; do
   ln -sf "$main_configs_path/defaults" "$config_folder/defaults"
   # Setup KAMP
   ln -sf ~/KAMP/Configuration "$config_folder/KAMP"
-  cp "$main_configs_path/KAMP_Config.cfg" "$config_folder"
+  cp "$main_configs_path/KAMP_Settings.cfg" "$config_folder"
 
   # Check if printer.cfg already exists
   if [ ! -f "$config_folder/printer.cfg" ] || [[ $response =~ ^[Yy]$ ]]; then
