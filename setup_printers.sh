@@ -47,6 +47,9 @@ for printer_folder in "${printer_folders[@]}"; do
 done
 sleep 1
 
+read -p "Do you want to override the printer.cfg files to default? (Y/n): " response
+response=${response:-n}  # Set default value to "n" if the input is empty
+
 # Loop through each printer folder
 for printer_folder in "${printer_folders[@]}"; do
   echo ""
@@ -66,7 +69,7 @@ for printer_folder in "${printer_folders[@]}"; do
   cp "$main_configs_path/KAMP_Config.cfg" "$config_folder"
 
   # Check if printer.cfg already exists
-  if ![ -f "$config_folder/printer.cfg" ]; then
+  if [ ! -f "$config_folder/printer.cfg" ] || [[ $response =~ ^[Yy]$ ]]; then
     cp "$main_configs_path/printer.cfg" "$config_folder"
     echo "printer.cfg file copied to printer folder."
   fi
