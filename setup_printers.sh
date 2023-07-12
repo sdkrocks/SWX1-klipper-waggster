@@ -47,7 +47,7 @@ for printer_folder in "${printer_folders[@]}"; do
 done
 sleep 1
 
-read -p "Do you want to override the printer.cfg files to default? (Y/n): " response
+read -p "Do you want to override the printer.cfg files to default? (y/N): " response
 response=${response:-n}  # Set default value to "n" if the input is empty
 
 # Loop through each printer folder
