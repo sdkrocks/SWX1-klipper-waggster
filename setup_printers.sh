@@ -11,22 +11,16 @@ kamp_path=~/KAMP
 # Clone the main_configs repository into the home directory
 echo "Cloning main_configs repository"
 if [ -d "$main_configs_path" ]; then
-    # Folder exists, remove local changes and pull
-    cd "$main_configs_path" && git fetch --all && git reset --hard origin/main
-else
-    # Folder does not exist, clone the repository
-    git clone "$main_configs_repo" "$main_configs_path"
+    rm -rf "$main_configs_path"
 fi
+git clone "$main_configs_repo" "$main_configs_path"
 
 # Clone KAMP repository into the home directory
 echo "Cloning main_configs repository"
 if [ -d "$kamp_path" ]; then
-    # Folder exists, remove local changes and pull
-    cd "$kamp_path" && git fetch --all && git reset --hard origin/main
-else
-    # Folder does not exist, clone the repository
-    git clone "$kamp_repo" "$kamp_path"
+    rm -rf "$kamp_path"
 fi
+git clone "$kamp_repo" "$kamp_path"
 
 cd ~/
 
@@ -60,14 +54,16 @@ for printer_folder in "${printer_folders[@]}"; do
   mkdir -p "$config_folder"
 
   # Create necessary symlinks
+  find "$printer_folder" -type l -delete
   rmdir "$printer_folder/gcodes"
   ln -sf "$gcodes_path" "$printer_folder"
   ln -sf "$main_configs_path/config" "$config_folder/config"
   ln -sf "$main_configs_path/macros" "$config_folder/macros"
   ln -sf "$main_configs_path/defaults" "$config_folder/defaults"
-  # Setup KAMP
   ln -sf ~/KAMP/Configuration "$config_folder/KAMP"
-  cp "$main_configs_path/KAMP_Settings.cfg" "$config_folder"
+
+  cp "$main_configs_path/KAMP_Settings.cfg" "$config_folder"  
+  cp "$main_configs_path/mainsail.cfg" "$config_folder"
 
   # Check if printer.cfg already exists
   if [ ! -f "$config_folder/printer.cfg" ] || [[ $response =~ ^[Yy]$ ]]; then
@@ -82,22 +78,6 @@ for printer_folder in "${printer_folders[@]}"; do
   echo "Processing of printer folder $printer_folder completed."
   echo ""
 done
-
-# Restart each service using the index from the printer_folders array
-#for index in "${!printer_folders[@]}"; do
-#    service="moonraker-$((index+1)).service"
-#    echo -n "Restarting $service ... "
-#    if systemctl restart "$service" >/dev/null 2>&1; then
-#        sleep 1  # Wait for a moment before checking the service status
-#        if systemctl is-active --quiet "$service"; then
-#            echo "OK"
-#        else
-#            echo "FAILED"
-#        fi
-#    else
-#        echo "FAILED"
-#    fi
-#done
 
 echo ""
 echo "Setup completed successfully."
